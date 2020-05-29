@@ -1,0 +1,49 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/home/zaber/turtlebot_ws/devel/include/**",
+                "/home/zaber/turtlebot3_ws/devel/include/**",
+                "/home/zaber/catkin_ws/devel/include/**",
+                "/opt/ros/melodic/include/**",
+                "/home/zaber/catkin_ws/src/beginner_tutorials/include/**",
+                "/home/zaber/turtlebot_ws/src/depthimage_to_laserscan/include/**",
+                "/home/zaber/turtlebot_ws/src/freenect_stack/freenect_camera/include/**",
+                "/home/zaber/turtlebot_ws/src/kobuki_auto_docking/include/**",
+                "/home/zaber/turtlebot_ws/src/kobuki_bumper2pc/include/**",
+                "/home/zaber/turtlebot_ws/src/kobuki_controller_tutorial/include/**",
+                "/home/zaber/turtlebot_ws/src/kobuki_desktop/kobuki_gazebo_plugins/include/**",
+                "/home/zaber/turtlebot_ws/src/kobuki_keyop/include/**",
+                "/home/zaber/turtlebot_ws/src/kobuki_node/include/**",
+                "/home/zaber/turtlebot_ws/src/kobuki_random_walker/include/**",
+                "/home/zaber/turtlebot_ws/src/kobuki_safety_controller/include/**",
+                "/home/zaber/catkin_ws/src/learning_launch/include/**",
+                "/home/zaber/catkin_ws/src/learning_opencv/include/**",
+                "/home/zaber/catkin_ws/src/learning_service/include/**",
+                "/home/zaber/catkin_ws/src/learning_topic/include/**",
+                "/home/zaber/catkin_ws/src/mcar_gazebo/include/**",
+                "/home/zaber/catkin_ws/src/mcar_teleop/include/**",
+                "/home/zaber/catkin_ws/src/pokemon/include/**",
+                "/home/zaber/turtlebot_ws/src/robot_pose_ekf/include/**",
+                "/home/zaber/turtlebot3_ws/src/turtlebot3_simulations/turtlebot3_fake/include/**",
+                "/home/zaber/turtlebot3_ws/src/turtlebot3_simulations/turtlebot3_gazebo/include/**",
+                "/home/zaber/turtlebot3_ws/src/turtlebot3/turtlebot3_slam/include/**",
+                "/home/zaber/turtlebot_ws/src/turtlebot_apps/turtlebot_actions/include/**",
+                "/home/zaber/turtlebot_ws/src/joystick_drivers/wiimote/include/**",
+                "/home/zaber/turtlebot_ws/src/yocs_cmd_vel_mux/include/**",
+                "/home/zaber/turtlebot_ws/src/yocs_controllers/include/**",
+                "/usr/include/**"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14"
+        }
+    ],
+    "version": 4
+}
