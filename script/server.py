@@ -42,7 +42,7 @@ def get_next_location(req):
 
     next_id = get_closest_pokemon(req.x, req.y)
     if next_id in range(len(Pokemon_Pose)):
-        Pokemon_Status[next_id] = 1
+        Pokemon_Status[next_id] = 3
         return LocationResponse(next_id, Pokemon_Pose[next_id][0], Pokemon_Pose[next_id][1], Pokemon_Pose[next_id][3])
     
     return LocationResponse(next_id, 0, 0, 0)
