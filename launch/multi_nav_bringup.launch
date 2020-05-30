@@ -4,15 +4,15 @@
   <arg name="model" default="waffle"/>
   <arg name="map_file" default="$(find pokemon)/maps/final_pro2.yaml"/>
   
-  <include file="$(find turtlebot3_navigation)/launch/multi_0_turtlebot3_navigation.launch">
+  <include file="$(find pokemon)/launch/multi_0_turtlebot3_navigation.launch">
 	  <arg name="model" value="$(arg model)" />
 	  <arg name="map_file" default="$(arg map_file)" />
   </include>
-  <include file="$(find turtlebot3_navigation)/launch/multi_1_turtlebot3_navigation.launch">
+  <include file="$(find pokemon)/launch/multi_1_turtlebot3_navigation.launch">
 	  <arg name="model" value="$(arg model)" />
 	  <arg name="map_file" default="$(arg map_file)" />
   </include>
-  <include file="$(find turtlebot3_navigation)/launch/multi_2_turtlebot3_navigation.launch">
+  <include file="$(find pokemon)/launch/multi_2_turtlebot3_navigation.launch">
 	  <arg name="model" value="$(arg model)" />
 	  <arg name="map_file" default="$(arg map_file)" />
   </include>

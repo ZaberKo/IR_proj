@@ -20,7 +20,7 @@ class NavTest():
         rospy.on_shutdown(self.shutdown)  
 
         self.id = id
-
+        self.pc = pokemon_capture(capture_distance=0.4)
         # 在每个目标位置暂停的时间 (单位：s)
         self.rest_time = rospy.get_param("~rest_time", 2)  
 
@@ -105,7 +105,7 @@ class NavTest():
             self.move_base.send_goal(self.goal)  
 
             # 五分钟时间限制  
-            finished_within_time = self.move_base.wait_for_result(rospy.Duration(300))   
+            finished_within_time = self.move_base.wait_for_result(rospy.Duration(300))
 
             # 查看是否成功到达  
             if not finished_within_time:  
@@ -140,9 +140,8 @@ class NavTest():
             rospy.sleep(self.rest_time) 
 
     def start_capture(self):
-        pc = pokemon_capture(capture_distance=0.4)
         try:
-            pc.start_capture()
+            self.pc.start_capture()
         except rospy.ROSInterruptException:
             pass
         except KeyboardInterrupt:

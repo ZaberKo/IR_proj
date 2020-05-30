@@ -4,20 +4,20 @@
   <arg name="second_tb3" default="tb3_1"/>
   <arg name="third_tb3"  default="tb3_2"/>
 
-  <arg name="first_tb3_x_pos" default="-5.0"/>
-  <arg name="first_tb3_y_pos" default="-1.8"/>
+  <arg name="first_tb3_x_pos" default="4.43"/>
+  <arg name="first_tb3_y_pos" default="4.19"/>
   <arg name="first_tb3_z_pos" default=" 0.0"/>
-  <arg name="first_tb3_yaw"   default=" 0.0"/>
+  <arg name="first_tb3_yaw"   default="3.14"/>
 
-  <arg name="second_tb3_x_pos" default="-5.0"/>
-  <arg name="second_tb3_y_pos" default="-2.3"/>
+  <arg name="second_tb3_x_pos" default="5.20"/>
+  <arg name="second_tb3_y_pos" default="4.19"/>
   <arg name="second_tb3_z_pos" default=" 0.0"/>
-  <arg name="second_tb3_yaw"   default=" 0.0"/>
+  <arg name="second_tb3_yaw"   default="3.14"/>
 
-  <arg name="third_tb3_x_pos" default="-5.0"/>
-  <arg name="third_tb3_y_pos" default="-2.8"/>
+  <arg name="third_tb3_x_pos" default="5.90"/>
+  <arg name="third_tb3_y_pos" default="4.19"/>
   <arg name="third_tb3_z_pos" default=" 0.0"/>
-  <arg name="third_tb3_yaw"   default=" 0.0"/>
+  <arg name="third_tb3_yaw"   default="3.14"/>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="/home/zzr/pokemon_maze_v2/worlds/pokemon.world"/>
