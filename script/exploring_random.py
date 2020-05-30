@@ -9,10 +9,13 @@ from geometry_msgs.msg import Pose, PoseWithCovarianceStamped, Point, Quaternion
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal  
 from random import sample  
 from math import pow, sqrt  
+from pokemon.srv import Location, LocationResponse
+from tf.transformations import quaternion_from_euler
+from pokemon_capture2 import pokemon_capture
 
 class NavTest():  
     def __init__(self):  
-        rospy.init_node('exploring_random', anonymous=True)  
+        rospy.init_node('pokemon_capture', anonymous=True)  
         rospy.on_shutdown(self.shutdown)  
 
         # 在每个目标位置暂停的时间 (单位：s)
@@ -30,14 +33,6 @@ class NavTest():
         # 设置目标点的位置  
         # 在rviz中点击 2D Nav Goal 按键，然后单击地图中一点  
         # 在终端中就会看到该点的坐标信息  
-        locations = dict()  
-
-        locations['1'] = Pose(Point(1.589, -0.376, 0.000),  Quaternion(0.000, 0.000, -0.447, 0.894))  
-        locations['2'] = Pose(Point(1.031, -0.550, 0.000),  Quaternion(0.000, 0.000, -0.847, 0.532))  
-        locations['3'] = Pose(Point(-0.674, -1.244, 0.000), Quaternion(0.000, 0.000, 0.000, 1.000))  
-        locations['4'] = Pose(Point(-0.543, -1.779, 0.000), Quaternion(0.000, 0.000, 0.645, 0.764))  
-        locations['5'] = Pose(Point(-1.701, -0.590, 0.000), Quaternion(0.000, 0.000, 0.340, 0.940))  
-        locations['6'] = Pose(Point(0.5, 1.2, 0.000),   Quaternion(0.000, 0.000, 0.000, 1.000))  
 
         # 发布控制机器人的消息  
         self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=5)  
@@ -52,69 +47,53 @@ class NavTest():
         rospy.loginfo("Connected to move base server")  
   
         # 保存机器人的在rviz中的初始位置  
-        initial_pose = PoseWithCovarianceStamped()  
+        current_pose = PoseWithCovarianceStamped()  
+        last_location = current_pose.pose.pose
 
         # 保存成功率、运行时间、和距离的变量  
-        n_locations = len(locations)  
         n_goals = 0  
         n_successes = 0  
-        i = n_locations  
+        i = 0  
         distance_traveled = 0  
         start_time = rospy.Time.now()  
         running_time = 0  
-        location = ""  
-        last_location = ""    
+
+        self.catching_pokemon = -1
+        self.goal_status = 0
+        self.goal = MoveBaseGoal()  
+        self.goal.target_pose.header.frame_id = 'map'  
+        self.goal.target_pose.pose = current_pose.pose.pose
+        
+        self.goal.target_pose.header.stamp = rospy.Time.now()  
  
         # 确保有初始位置  
-        while initial_pose.header.stamp == "":  
+        while current_pose.header.stamp == "":  
             rospy.sleep(1)  
 
         rospy.loginfo("Starting navigation test")  
 
         # 开始主循环，随机导航  
         while not rospy.is_shutdown():  
-            # 如果已经走完了所有点，再重新开始排序  
-            if i == n_locations:  
-                i = 0  
-                sequence = sample(locations, n_locations)  
- 
-                # 如果最后一个点和第一个点相同，则跳过  
-                if sequence[0] == last_location:  
-                    i = 1  
-
-            # 在当前的排序中获取下一个目标点  
-            location = sequence[i]  
-
-            # 跟踪行驶距离  
-            # 使用更新的初始位置  
-            if initial_pose.header.stamp == "":  
-                distance = sqrt(pow(locations[location].position.x -   
-                                    locations[last_location].position.x, 2) +  
-                                pow(locations[location].position.y -   
-                                    locations[last_location].position.y, 2))  
-            else:  
-                rospy.loginfo("Updating current pose.")  
-                distance = sqrt(pow(locations[location].position.x -   
-                                    initial_pose.pose.pose.position.x, 2) +  
-                                pow(locations[location].position.y -   
-                                    initial_pose.pose.pose.position.y, 2))  
-                initial_pose.header.stamp = ""  
-
-            # 存储上一次的位置，计算距离  
-            last_location = location  
-
             # 计数器加1  
             i += 1  
             n_goals += 1  
 
-            # 设定下一个目标点  
-            self.goal = MoveBaseGoal()  
-            self.goal.target_pose.pose = locations[location]  
-            self.goal.target_pose.header.frame_id = 'map'  
-            self.goal.target_pose.header.stamp = rospy.Time.now()  
+            current_pose = self.goal.target_pose.pose
+            
+            # 跟踪行驶距离  
+            # 使用更新的初始位置  
+            distance = sqrt(pow(current_pose.position.x -   
+                                last_location.position.x, 2) +  
+                            pow(current_pose.position.y -   
+                                last_location.position.y, 2))  
+            # 存储上一次的位置，计算距离  
+            last_location = self.goal.target_pose.pose
+            # get next goal 
+            pose = self.get_next_goal(current_pose, self.catching_pokemon, self.goal_status)
 
-            # 让用户知道下一个位置  
-            rospy.loginfo("Going to: " + str(location))  
+            # 设定下一个目标点  
+            self.goal.target_pose.pose = pose
+            self.goal.target_pose.header.stamp = rospy.Time.now()  
 
             # 向下一个位置进发  
             self.move_base.send_goal(self.goal)  
@@ -126,6 +105,7 @@ class NavTest():
             if not finished_within_time:  
                 self.move_base.cancel_goal()  
                 rospy.loginfo("Timed out achieving goal")  
+                self.goal_status = 0
             else:  
                 state = self.move_base.get_state()  
                 if state == GoalStatus.SUCCEEDED:  
@@ -133,8 +113,11 @@ class NavTest():
                     n_successes += 1  
                     distance_traveled += distance  
                     rospy.loginfo("State:" + str(state))  
+                    self.start_capture()
                 else:  
                   rospy.loginfo("Goal failed with error code: " + str(goal_states[state]))  
+
+                self.goal_status = state
 
             # 运行所用时间  
             running_time = rospy.Time.now() - start_time  
@@ -148,7 +131,33 @@ class NavTest():
             rospy.loginfo("Running time: " + str(trunc(running_time, 1)) +   
                           " min Distance: " + str(trunc(distance_traveled, 1)) + " m")  
 
-            rospy.sleep(self.rest_time)  
+            rospy.sleep(self.rest_time) 
+
+    def start_capture(self):
+        pc = pokemon_capture(capture_distance=0.4)
+        try:
+            pc.start_capture()
+        except rospy.ROSInterruptException:
+            pass
+        except KeyboardInterrupt:
+            print("Shutting down") 
+
+    def get_next_goal(self, current_pose, catching_pokemon, goal_status):
+        rospy.wait_for_service('manage')
+        try:
+            manage = rospy.ServiceProxy('manage', Location)
+            x = current_pose.position.x
+            y = current_pose.position.y
+            next_goal = manage(1, catching_pokemon, goal_status, x, y)
+
+            rospy.loginfo('Pokemon: %d  Location: (%.2f %.2f) Yaw: %.2f' % 
+                         (next_goal.goal_id, next_goal.goal_x, next_goal.goal_y, next_goal.goal_yaw))
+            q = quaternion_from_euler(0, 0, next_goal.goal_yaw)
+            pose = Pose(Point(next_goal.goal_x, next_goal.goal_y, 0.000),  Quaternion(q[0], q[1], q[2], q[3]))
+            self.catching_pokemon = next_goal.goal_id
+            return pose 
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
 
     def update_initial_pose(self, initial_pose):  
         self.initial_pose = initial_pose  

@@ -7,6 +7,7 @@ import actionlib
 from actionlib_msgs.msg import *  
 from geometry_msgs.msg import Pose, PoseWithCovarianceStamped, Point, Quaternion, Twist  
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal  
+from tf.transformations import quaternion_from_euler
 
 # 节点初始化 
 rospy.init_node('move_test', anonymous=True)    
@@ -19,7 +20,8 @@ while move_base.wait_for_server(rospy.Duration(5.0)) == 0:
     rospy.loginfo("Connected to move base server")  
 
 # 设定目标点  
-target = Pose(Point(-1.543, 1.779, 0.000), Quaternion(0.000, 0.000, 0.645, 0.764))  
+q = quaternion_from_euler(0, 0, 0)
+target = Pose(Point(-1.543, 1.779, 0.000), Quaternion(q[0], q[1], q[2], q[3]))  
 goal = MoveBaseGoal()  
 goal.target_pose.pose = target  
 goal.target_pose.header.frame_id = 'map'  

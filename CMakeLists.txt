@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
   sensor_msgs
+  message_generation
 )
 find_package(OpenCV REQUIRED)
 
@@ -57,12 +58,11 @@ find_package(OpenCV REQUIRED)
 #   Message2.msg
 # )
 
-## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+# Generate services in the 'srv' folder
+add_service_files(
+  FILES
+  Location.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -72,10 +72,10 @@ find_package(OpenCV REQUIRED)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs  # Or other packages containing msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
