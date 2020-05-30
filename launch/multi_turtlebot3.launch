@@ -20,7 +20,7 @@
   <arg name="third_tb3_yaw"   default="3.14"/>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="/home/zzr/pokemon_maze_v2/worlds/pokemon.world"/>
+    <arg name="world_name" value="/home/junyiao/turtlebot3_ws/src/pokemon_maze_v2/worlds/pokemon.world"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="gui" value="true"/>
