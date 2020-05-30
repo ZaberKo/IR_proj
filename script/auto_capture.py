@@ -16,11 +16,13 @@ from nav_msgs.msg import Odometry
 
 class NavTest():  
     def __init__(self, id):  
-        rospy.init_node('pokemon_capture', anonymous=True)  
+        
         rospy.on_shutdown(self.shutdown)  
 
         self.id = id
-        self.pc = pokemon_capture(capture_distance=0.4)
+        rospy.init_node('pokemon_capture_%d'%(self.id), anonymous=True)  
+        self.pc = pokemon_capture(id=id, capture_distance=0.6, dis_eps=0.2, 
+                                  area_eps=0.5, move_speed=2, rotate_speed=0.5)
         # 在每个目标位置暂停的时间 (单位：s)
         self.rest_time = rospy.get_param("~rest_time", 2)  
 
@@ -119,7 +121,7 @@ class NavTest():
                     n_successes += 1  
                     distance_traveled += distance  
                     rospy.loginfo("State:" + str(state))  
-                    # self.start_capture()
+                    self.start_capture()
                 else:  
                   rospy.loginfo("Goal failed with error code: " + str(goal_states[state]))  
 

@@ -93,29 +93,33 @@ def canny_detect(img,area_eps=0.05,ratio_threshold=0.9):
     # cv2.drawContours(img,cnts,-1,(255,255,0),2)
 
     center=None
-    if len(cnts) >=2:
-        areas = np.array([cv2.contourArea(cnt) for cnt in cnts])
-        indices=np.argsort(areas)[::-1]
+    try:
+        if len(cnts) >=2:
+            areas = np.array([cv2.contourArea(cnt) for cnt in cnts])
+            indices=np.argsort(areas)[::-1]
 
-        cnt_r=cnts[indices[0]]
-        area_r=areas[indices[0]]
-        for idx in indices[1:]:
-            # nonMaximumSuppression
-            if areas[idx]/area_r>1-area_eps:
-                continue
+            cnt_r=cnts[indices[0]]
+            area_r=areas[indices[0]]
+            for idx in indices[1:]:
+                # nonMaximumSuppression
+                if areas[idx]/area_r>1-area_eps:
+                    continue
 
-            cnt_g=cnts[idx]
-            break
-        xr, yr, wr, hr=cv2.boundingRect(cnt_r)
-        xg, yg, wg, hg=cv2.boundingRect(cnt_g)
-        
-        # double check green rect is in red rect
-        if xr<xg and yr<yg and xr+wr>xg+wg and yr+hr>yg+hg:
-            # check rect ratio
-            if check_ratio(wr,hr,ratio_threshold) and check_ratio(wg,hg,ratio_threshold-0.1):
-                img=boundingBox(img,xr, yr, wr, hr,color=(0,0,255))
-                img=boundingBox(img,xg, yg, wg, hg,color=(0,255,0))
-                center=(xr+wr//2,yr+hr//2)
+                cnt_g=cnts[idx]
+                break
+            xr, yr, wr, hr=cv2.boundingRect(cnt_r)
+            xg, yg, wg, hg=cv2.boundingRect(cnt_g)
+            
+            # double check green rect is in red rect
+            if xr<xg and yr<yg and xr+wr>xg+wg and yr+hr>yg+hg:
+                # check rect ratio
+                if check_ratio(wr,hr,ratio_threshold) and check_ratio(wg,hg,ratio_threshold-0.1):
+                    img=boundingBox(img,xr, yr, wr, hr,color=(0,255,0))
+                    height, width
+                    img=boundingBox(img,xr-50, yr-50, wr+100, hr+100,color=(0,0,255))
+                    center=(xr+wr//2,yr+hr//2)
+    except:
+        pass
 
     return img,center
 
@@ -132,17 +136,18 @@ def makeSimpleProfile(output, input, slop):
     return output
 
 class pokemon_capture:
-    def __init__(self, capture_distance, rate=100, move_speed=0.1, rotate_speed=0.1, dis_eps=0.025, pixel_eps=5,area_eps=0.1,ratio_threshold=0.7):
+    def __init__(self, id, capture_distance, rate=100, move_speed=0.1, rotate_speed=0.1, dis_eps=0.025, pixel_eps=5,area_eps=0.5,ratio_threshold=0.7):
         self.cv_image = None
         self.bridge = CvBridge()
+        self.id = id
         self.image_sub = rospy.Subscriber(
-            "/camera/rgb/image_raw", Image, self.img_callback)
+            "/tb3_%d/camera/rgb/image_raw"%(self.id), Image, self.img_callback)
         self.imgae_pub = rospy.Publisher(
-            '/pokemon/image_raw', Image, queue_size=10)
+            '/tb3_%d/pokemon/image_raw'%(self.id), Image, queue_size=10)
         self.scan_sub = rospy.Subscriber(
-            "/scan", LaserScan, self.scan_callback)
+            "/tb3_%d/scan"%(self.id), LaserScan, self.scan_callback)
         self.cmd_vel = rospy.Publisher(
-            '/cmd_vel', Twist, queue_size=10)
+            '/tb3_%d/cmd_vel'%(self.id), Twist, queue_size=10)
         self.capture_distance = capture_distance
         self.turn = 0
         self.vel = 0
@@ -213,7 +218,7 @@ class pokemon_capture:
         self.action()
 
     def save_img(self):
-        cv2.imwrite("Pokemon%d.jpg" % self.pokemon_cnt, self.cv_image)
+        cv2.imwrite("Pokemon%d_%d.jpg" % (self.id, self.pokemon_cnt), self.cv_image)
 
     def action(self):
         while self.start_capture_flag:
