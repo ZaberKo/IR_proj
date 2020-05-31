@@ -61,7 +61,7 @@ def init_server():
             Pokemon_Status.append(0)
             x.append([float(pose[0]), float(pose[1])])
 
-        result = [2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 2]
+        result = [2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0]
 
     for i in range(len(x)):
         classified_pose[(x[i][0], x[i][1])] = result[i]

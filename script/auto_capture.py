@@ -21,7 +21,7 @@ class NavTest():
 
         self.id = id
         rospy.init_node('pokemon_capture_%d'%(self.id), anonymous=True)  
-        self.pc = pokemon_capture(id=id, capture_distance=0.6, dis_eps=0.2, 
+        self.pc = pokemon_capture(id=id, capture_distance=0.4, dis_eps=0.2,
                                   area_eps=0.5, move_speed=2, rotate_speed=0.5)
         # 在每个目标位置暂停的时间 (单位：s)
         self.rest_time = rospy.get_param("~rest_time", 2)  
@@ -52,7 +52,7 @@ class NavTest():
         rospy.loginfo("Connected to move base server")  
   
         # 保存机器人的在rviz中的初始位置  
-        current_pose = rospy.wait_for_message('/tb3_%d/odom'%(self.id),Odometry,timeout=5)
+        current_pose = rospy.wait_for_message('/tb3_%d/odom' % self.id, Odometry, timeout=5)
         last_location = current_pose.pose.pose
 
         # 保存成功率、运行时间、和距离的变量  
@@ -83,7 +83,7 @@ class NavTest():
             i += 1  
             n_goals += 1  
 
-            current_pose = rospy.wait_for_message('/tb3_0/odom',Odometry,timeout=5).pose.pose
+            current_pose = rospy.wait_for_message('/tb3_%d/odom' % self.id, Odometry, timeout=5).pose.pose
             
             # 跟踪行驶距离  
             # 使用更新的初始位置  
