@@ -52,7 +52,7 @@ def init_server():
     s = rospy.Service('manage', Location, get_next_location)
 
     x = []
-    with open('/home/junyiao/multi_turtlebot3_ws/src/IR_proj/script/pokemon_pose.txt', 'r') as f:
+    with open('./script/pokemon_pose.txt', 'r') as f:
         for pose in f.readlines():
             # x   y   z   yaw
             pose = pose.strip().split()

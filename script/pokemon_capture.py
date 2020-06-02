@@ -135,18 +135,18 @@ def makeSimpleProfile(output, input, slop):
     return output
 
 class pokemon_capture:
-    def __init__(self, id, capture_distance, rate=100, move_speed=0.1, rotate_speed=0.1, dis_eps=0.025, pixel_eps=5,area_eps=0.5,ratio_threshold=0.7):
+    def __init__(self, capture_distance, rate=100, move_speed=0.1, rotate_speed=0.1, dis_eps=0.025, pixel_eps=7,area_eps=0.5,ratio_threshold=0.7):
         self.cv_image = None
         self.bridge = CvBridge()
-        self.id = id
+        self.id = 0
         self.image_sub = rospy.Subscriber(
-            "/tb3_%d/camera/rgb/image_raw"%(self.id), Image, self.img_callback)
+            "/camera/rgb/image_raw", Image, self.img_callback)
         self.imgae_pub = rospy.Publisher(
             '/tb3_%d/pokemon/image_raw'%(self.id), Image, queue_size=10)
         self.scan_sub = rospy.Subscriber(
-            "/tb3_%d/scan"%(self.id), LaserScan, self.scan_callback)
+            "/scan", LaserScan, self.scan_callback)
         self.cmd_vel = rospy.Publisher(
-            '/tb3_%d/cmd_vel'%(self.id), Twist, queue_size=10)
+            '/cmd_vel', Twist, queue_size=10)
         self.capture_distance = capture_distance
         self.turn = 0
         self.vel = 0
@@ -234,8 +234,8 @@ class pokemon_capture:
         self.start_capture_flag = False
 
     def scan_callback(self, data):
-        if not self.start_capture_flag:
-            return
+        # if not self.start_capture_flag:
+        #     return
         # rate=30
         ranges = data.ranges  # tuple
         angle_increment=data.angle_increment
@@ -271,42 +271,39 @@ class pokemon_capture:
         if count==0:
             back_distance=-1
         else:
-            back_distance = back_distance/count        
+            back_distance = back_distance/count  
         
-        
-        rospy.loginfo("%.3f meter away from pokemon." % (distance))
 
-        if self.state == state.TRANSLATE1:
-            if distance > self.capture_distance+self.dis_eps:
-                self.vel=min(self.move_speed,self.vel+0.01)
-            elif distance < self.capture_distance-self.dis_eps:
-                self.vel=max(-self.move_speed,self.vel-0.01)
+        rospy.loginfo("front:%.3f back:%.3f" % (distance,back_distance))
+
+        # if self.state == state.TRANSLATE1:
+        #     if distance > self.capture_distance+self.dis_eps:
+        #         self.vel=min(self.move_speed,self.vel+0.01)
+        #     elif distance < self.capture_distance-self.dis_eps:
+        #         self.vel=max(-self.move_speed,self.vel-0.01)
             
 
-            eps=1e-7
-            if self.vel<self.move_speed+eps and self.vel>self.move_speed-eps:
-                self.state=state.TRANSLATE2
-                print('trun to TRANSLATE2')
+        #     eps=1e-7
+        #     if self.vel<self.move_speed+eps and self.vel>self.move_speed-eps:
+        #         self.state=state.TRANSLATE2
+        #         print('trun to TRANSLATE2')
     
-        elif self.state==state.TRANSLATE2:
-            decay_dis=0.1
-            if distance > self.capture_distance+self.dis_eps:
-                self.vel = min((self.move_speed/decay_dis)*(distance-self.capture_distance),self.move_speed)
-            elif distance < self.capture_distance-self.dis_eps:
-                self.vel = -min((self.move_speed/decay_dis)*(self.capture_distance-distance),self.move_speed)
-            else:
-                self.vel=0
+        # elif self.state==state.TRANSLATE2:
+        #     decay_dis=0.1
+        #     if distance > self.capture_distance+self.dis_eps:
+        #         self.vel = min((self.move_speed/decay_dis)*(distance-self.capture_distance),self.move_speed)
+        #     elif distance < self.capture_distance-self.dis_eps:
+        #         self.vel = -min((self.move_speed/decay_dis)*(self.capture_distance-distance),self.move_speed)
+        #     else:
+        #         self.vel=0
             
         
-        print('speed:%f'%self.vel)
-        if ((distance <= self.capture_distance+self.dis_eps and distance >= self.capture_distance-self.dis_eps) \
-            or back_distance<0.16) \
-            and self.turn==0:
-
-            self.init_param()
-            self.pokemon_cnt += 1
-            self.save_img()
-            rospy.loginfo("I catch a pokemon. total:%d" % self.pokemon_cnt)
+        # print('speed:%f'%self.vel)
+        # if distance <= self.capture_distance+self.dis_eps and distance >= self.capture_distance-self.dis_eps and self.turn==0:
+        #     self.init_param()
+        #     self.pokemon_cnt += 1
+        #     self.save_img()
+        #     rospy.loginfo("I catch a pokemon. total:%d" % self.pokemon_cnt)
                   
 
 
@@ -314,7 +311,7 @@ class pokemon_capture:
 def main(args):
     rospy.init_node('pokemon_capture', anonymous=True)
 
-    pc = pokemon_capture(0,capture_distance=0.8)
+    pc = pokemon_capture(capture_distance=0.4)
     rospy.loginfo(
         '\npress any key to capture pokemon.\nenter "exit" to exit node.\n')
     try:
@@ -335,5 +332,5 @@ def main(args):
         print("Shutting down")
 
 
-# if __name__ == '__main__':
-#     main(sys.argv)
+if __name__ == '__main__':
+    main(sys.argv)

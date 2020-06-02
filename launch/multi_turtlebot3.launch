@@ -1,5 +1,6 @@
 <launch>
   <arg name="model" default="waffle" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="world_file" default="$(find pokemon)/worlds/pokemon.world"/>
   <arg name="first_tb3"  default="tb3_0"/>
   <arg name="second_tb3" default="tb3_1"/>
   <arg name="third_tb3"  default="tb3_2"/>
@@ -20,7 +21,7 @@
   <arg name="third_tb3_yaw"   default="3.14"/>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="/home/junyiao/turtlebot3_ws/src/pokemon_maze_v2/worlds/pokemon.world"/>
+    <arg name="world_name" value="$(arg world_file)"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="gui" value="true"/>

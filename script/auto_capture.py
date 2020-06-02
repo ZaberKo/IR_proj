@@ -21,8 +21,8 @@ class NavTest():
 
         self.id = id
         rospy.init_node('pokemon_capture_%d'%(self.id), anonymous=True)  
-        self.pc = pokemon_capture(id=id, capture_distance=0.4, dis_eps=0.2,
-                                  area_eps=0.5, move_speed=2, rotate_speed=0.5)
+        self.pc = pokemon_capture(id=id, capture_distance=0.35, dis_eps=0.025,
+                                  area_eps=0.5, move_speed=0.1, rotate_speed=0.1)
         # 在每个目标位置暂停的时间 (单位：s)
         self.rest_time = rospy.get_param("~rest_time", 2)  
 
